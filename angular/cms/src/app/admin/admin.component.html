@@ -1,0 +1,184 @@
+<style>
+    html,
+    body {
+        font-family: Arial, sans-serif;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .header {
+        background-color: #333;
+        color: #fff;
+        padding: 20px;
+    }
+
+    .main {
+        background-color: #f2f2f2;
+        padding: 20px;
+    }
+
+    .featured-article {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        max-width: 100%;
+        background-color: #fff;
+        padding: 20px;
+    }
+
+    .featured-article img {
+        width: 100%;
+        height: auto;
+        margin-right: 10px;
+    }
+
+    .article-summary {
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    .article-title {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .article-columns {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .article-column {
+        background-color: #fff;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .article-column a {
+        text-decoration: none;
+        color: black;
+    }
+
+    .article-column a:hover {
+        text-decoration: underline;
+    }
+
+    .article-column img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    @media screen and (min-width: 800px) {
+        .featured-article {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .article-columns {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+</style>
+<header class="header">
+    <h1>Blog</h1>
+    <div *ngIf="username !== undefined">
+        <p>Bonjour utilisateur : {{username}}</p>
+    </div>
+</header>
+<a routerLink="/home">home</a>
+<nav *ngIf="!eventHappend">
+    <button (click)="handleEvent('selected')">
+        Sélectionné l'article mis en avant
+    </button>
+    <button (click)="handleEvent('modifyArticle')">
+        Modifié un article
+    </button>
+    <button (click)="handleEvent('modifyBioAuthor')">
+        Modifié la bio d'un auteur
+    </button>
+</nav>
+<div [ngSwitch]="displayMode">
+
+    <div *ngSwitchCase="'selected'">
+        <section class="article-columns">
+            <article *ngFor="let element of articles" class="article-column">
+                <img src="{{element.imageUrl}}" alt="Image de l'article 1">
+                <h2 class="article-title">{{element.title}}</h2>
+                <button (click)="selectedArticleFeatured(element.id)">Mettre cet article en haut de page</button>
+            </article>
+        </section>
+        <button (click)="admin()">Retour</button>
+    </div>
+    <div *ngSwitchCase="'modifyArticle'">
+        <section class="article-columns">
+            <label for="article">Choisissez l'article à modifié :</label>
+            <select name="article" id="article" (change)="submitPatchValue($event.target)">
+                <option value="">--Please choose an option--</option>
+                <option *ngFor="let article of articles" [value]="article.id"
+                    [selected]="article.id === selectedArticleId">{{article.title}}</option>
+            </select>
+            <article class="article-column">
+                <h2 class="article-title">Formulaire de modification de l'article : {{title}}</h2>
+                <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+                    <div>
+                        <label for="imageUrl">url de l'image:</label>
+                        <input type="text" id="imageUrl" formControlName="imageUrl">
+                    </div>
+                    <div>
+                        <label for="title">Titre:</label>
+                        <input type="text" id="title" formControlName="title">
+                    </div>
+                    <div>
+                        <label for="summary">Son résumé:</label>
+                        <input type="text" id="summary" formControlName="summary">
+                    </div>
+                    <div>
+                        <label for="content">Contenu:</label>
+                        <input type="text" id="content" formControlName="content">
+                    </div>
+                    <div>
+                        <p>exemple : sucré,salé,viennoiserie</p>
+                        <label for="keywords">Mots-clefs:</label>
+                        <input type="text" id="keywords" formControlName="keywords">
+                    </div>
+                    <label for="author">Choisir un auteur:</label>
+                    <select id="author" formControlName="authorId">
+                        <option value="">--Please choose an option--</option>
+                        <option *ngFor="let auteur of authors" [ngValue]="auteur.id">{{auteur.name}}</option>
+                    </select>
+
+                    <button type="submit" [disabled]="!profileForm.valid">Enregistrer</button>
+                </form>
+
+            </article>
+        </section>
+        <button (click)="admin()">Retour</button>
+    </div>
+    <div *ngSwitchCase="'modifyBioAuthor'">
+        <section class="article-columns">
+            <label for="author">Changement sur quels auteurs ? :</label>
+            <select name="author" id="author" (change)="submitPatchValueAuthor($event.target)">
+                <option value="">--Please choose an option--</option>
+                <option *ngFor="let author of authors" [value]="author.id" [selected]="author.id === selectedAuthorId">
+                    {{author.name}}</option>
+            </select>
+            <article class="article-column">
+                <h2 class="article-title">Formulaire de modification de l'auteur : {{authorName}}</h2>
+                <form [formGroup]="profileFormAuthor" (ngSubmit)="onSubmit2()">
+                    <div>
+                        <label for="name">Nom de l'auteur:</label>
+                        <input type="text" id="name" formControlName="name">
+                    </div>
+                    <div>
+                        <label for="bio">Bio de l'auteur:</label>
+                        <input type="text" id="bio" formControlName="bio">
+                    </div>
+                    <button type="submit" [disabled]="!profileFormAuthor.valid">Enregistrer</button>
+                </form>
+
+            </article>
+        </section>
+        <button (click)="admin()">Retour</button>
+    </div>
+</div>

@@ -1,0 +1,124 @@
+<style>
+    html,
+    body {
+        font-family: Arial, sans-serif;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .header {
+        background-color: #333;
+        color: #fff;
+        padding: 20px;
+    }
+
+    .main {
+        background-color: #f2f2f2;
+        padding: 20px;
+    }
+
+    .featured-article {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        max-width: 100%;
+        background-color: #fff;
+        padding: 20px;
+    }
+
+    .featured-article img {
+        width: 100%;
+        height: auto;
+        margin-right: 10px;
+    }
+
+    .article-summary {
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    .article-title {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .article-columns {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .article-column {
+        background-color: #fff;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .article-column a {
+        text-decoration: none;
+        color: black;
+    }
+
+    .article-column a:hover {
+        text-decoration: underline;
+    }
+
+    .article-column img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    @media screen and (min-width: 800px) {
+        .featured-article {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .article-columns {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+</style>
+<header class="header">
+    <h1>Blog</h1>
+    <div *ngIf="username === undefined">
+        <a routerLink="/signin">Se connecter</a>
+        <a routerLink="/create">Créer un compte</a>
+    </div>
+    <div *ngIf="username !== undefined">
+        <p>Bonjour utilisateur : {{username}}</p>
+    </div>
+</header>
+<main class="main">
+    <section class="featured-article">
+        <img [src]="article.imageUrl" alt="Article Image" />
+        <div class="article-content">
+            <h2 class="article-title">{{ article.title }}</h2>
+            <p class="article-summary">{{ article.summary }}</p>
+            <p class="article-summary"><a routerLink="/author/{{article.id}}">Author: {{ article.author.name }}</a></p>
+            <p class="article-summary">Keywords: {{ article.keywords.join(', ') }}</p>
+            <div *ngIf="username !==undefined">
+                <i class="fa-solid fa-pen-to-square" (click)="goToAdminEditArticle(article)"></i>
+            </div>
+        </div>
+    </section>
+    <a routerLink="/home">Revenir à la page d'accueil</a>
+    <div>Voici des articles qui pourraient vous intéresser :</div>
+    <section class="article-columns">
+        <article *ngFor="let article of recommandedArticle" class="article-column">
+            <img [src]="article.imageUrl" alt="Article Image" />
+            <div class="article-content">
+                <h2 class="article-title">{{ article.title }}</h2>
+                <p class="article-summary">{{ article.summary }}</p>
+                <p class="article-summary"> <a style="color:blue" routerLink="/author/{{article.id}}">Author: {{
+                        article.author.name }}</a>
+                </p>
+                <p class="article-summary">Keywords: {{ article.keywords.join(', ') }}</p>
+            </div>
+            <div *ngIf="username !==undefined">
+                <i class="fa-solid fa-pen-to-square" (click)="goToAdminEditArticle(article)"></i>
+            </div>
+        </article>
+    </section>
+</main>
